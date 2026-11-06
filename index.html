@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f1114">
+<title>Kart&amp;Fun App – Prototyp</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1114; --card: #191c21; --card2: #22262c; --line: #2c3138;
+    --text: #eef0f2; --muted: #98a0aa; --volt: #3dd9ff; --red: #ff3b2f; --green: #3ee08a; --amber: #ffb020;
+    --display: "Big Shoulders Display", Impact, sans-serif; --body: "Manrope", system-ui, sans-serif; --mono: "JetBrains Mono", monospace;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body { background: #07080a; color: var(--text); font-family: var(--body); display: flex; justify-content: center; align-items: center; }
+  .demo-note { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--amber); background: rgba(255,176,32,.1); border: 1px solid rgba(255,176,32,.35); padding: 5px 10px; border-radius: 99px; z-index: 50; white-space: nowrap; }
+  .phone { width: 390px; height: 844px; max-height: calc(100vh - 60px); background: var(--bg); border-radius: 46px; border: 10px solid #1b1d21; box-shadow: 0 30px 80px rgba(0,0,0,.6); overflow: hidden; position: relative; display: flex; flex-direction: column; }
+  @media (max-width: 500px) { body { display: block; } .phone { width: 100%; height: 100dvh; max-height: none; border: 0; border-radius: 0; } .demo-note { top: auto; bottom: 86px; } }
+  .screen { flex: 1; overflow-y: auto; padding: 18px 18px 100px; scrollbar-width: none; }
+  .screen::-webkit-scrollbar { display: none; }
+  .view { display: none; animation: in .35s ease; } .view.active { display: block; }
+  @keyframes in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  header.top { display: flex; justify-content: space-between; align-items: center; padding: 30px 2px 16px; }
+  .brand { font-family: var(--display); font-weight: 900; font-size: 26px; text-transform: uppercase; letter-spacing: .01em; }
+  .brand span { color: var(--volt); }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--volt), #1f7f99); display: grid; place-items: center; font-weight: 700; color: #06232b; }
+  h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: 30px; margin: 6px 0 14px; letter-spacing: .01em; }
+  h3 { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: 20px; margin: 24px 0 10px; letter-spacing: .02em; }
+  .muted { color: var(--muted); }
+
+  /* Wallet card */
+  .wallet { position: relative; border-radius: 22px; padding: 20px; overflow: hidden; background: radial-gradient(120% 140% at 100% 0%, #1f6f86 0%, #133543 38%, #11161b 75%); border: 1px solid #2b4651; }
+  .wallet::after { content: ""; position: absolute; right: -40px; bottom: -40px; width: 180px; height: 180px; background: repeating-conic-gradient(rgba(255,255,255,.06) 0 25%, transparent 0 50%) 0 0/22px 22px; transform: rotate(12deg); border-radius: 30px; }
+  .wallet .lbl { font: 600 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #a8dbe9; }
+  .wallet .bal { font-family: var(--display); font-weight: 900; font-size: 58px; line-height: 1; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+  .wallet .bal small { font-size: 26px; color: #a8dbe9; }
+  .wallet .row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 18px; position: relative; z-index: 1; }
+  .wallet .num { font: 500 13px var(--mono); color: #cfe9f1; letter-spacing: .1em; }
+  .chip { font: 700 11px var(--mono); padding: 4px 9px; border-radius: 99px; background: rgba(61,217,255,.15); color: var(--volt); border: 1px solid rgba(61,217,255,.35); }
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  button { font: inherit; color: inherit; border: 0; cursor: pointer; }
+  .btn { background: var(--card2); border: 1px solid var(--line); border-radius: 16px; padding: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn.primary { background: var(--volt); color: #05222b; border-color: var(--volt); }
+  .btn:active { transform: scale(.98); }
+
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px; }
+  .tile .v { font-family: var(--display); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums; }
+  .tile .k { font-size: 11.5px; color: var(--muted); }
+
+  .list { display: grid; gap: 10px; }
+  .item { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 14px; display: flex; gap: 12px; align-items: center; }
+  .date { width: 52px; flex: none; text-align: center; border-radius: 12px; background: var(--card2); padding: 8px 0; }
+  .date b { display: block; font-family: var(--display); font-size: 24px; line-height: 1; }
+  .date span { font: 600 10px var(--mono); color: var(--volt); text-transform: uppercase; }
+  .item .t { font-weight: 700; }
+  .item .s { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .item .go { margin-left: auto; font: 700 12px var(--mono); color: var(--volt); white-space: nowrap; }
+  .tag { display: inline-block; font: 700 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 6px; margin-bottom: 4px; }
+  .tag.ev { background: rgba(61,217,255,.15); color: var(--volt); } .tag.tu { background: rgba(255,59,47,.15); color: #ff7a71; } .tag.of { background: rgba(62,224,138,.15); color: var(--green); }
+
+  .hero-ev { border-radius: 20px; padding: 18px; background: linear-gradient(135deg, #3a1210, #1a1c21 70%); border: 1px solid #4a1d1a; }
+  .hero-ev .k { font: 700 11px var(--mono); color: #ff8a82; letter-spacing: .1em; text-transform: uppercase; }
+  .hero-ev .t { font-family: var(--display); font-weight: 900; font-size: 32px; text-transform: uppercase; line-height: 1; margin: 6px 0; }
+  .countdown { display: flex; gap: 8px; margin-top: 12px; }
+  .countdown div { background: rgba(0,0,0,.35); border-radius: 10px; padding: 6px 10px; text-align: center; }
+  .countdown b { font-family: var(--display); font-size: 24px; display: block; line-height: 1; font-variant-numeric: tabular-nums; }
+  .countdown span { font: 600 9px var(--mono); color: var(--muted); text-transform: uppercase; }
+
+  .lb { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .lb .r { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .lb .r:last-child { border-bottom: 0; }
+  .lb .p { font-family: var(--display); font-weight: 900; font-size: 22px; color: var(--muted); }
+  .lb .r:nth-child(1) .p { color: #ffd34d; } .lb .r:nth-child(2) .p { color: #d7dde4; } .lb .r:nth-child(3) .p { color: #e0a06a; }
+  .lb .time { font: 600 14px var(--mono); font-variant-numeric: tabular-nums; }
+  .lb .me { background: rgba(61,217,255,.08); }
+  .seg { display: flex; gap: 6px; background: var(--card); padding: 4px; border-radius: 12px; margin-bottom: 12px; }
+  .seg button { flex: 1; padding: 8px; border-radius: 9px; font-weight: 700; font-size: 13px; color: var(--muted); background: transparent; }
+  .seg button.on { background: var(--card2); color: var(--text); }
+
+  .tx { display: flex; justify-content: space-between; padding: 12px 2px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .tx .a { font: 600 14px var(--mono); }
+  .tx .a.plus { color: var(--green); }
+
+  /* Bottom nav */
+  nav.tabs { position: absolute; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(15,17,20,.92); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 8px 6px calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 10; }
+  nav.tabs button { background: none; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--muted); padding: 6px 0; }
+  nav.tabs button.on { color: var(--volt); }
+  nav.tabs svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Sheets */
+  .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.55); opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 20; }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--card); border-radius: 26px 26px 0 0; padding: 12px 18px calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateY(105%); transition: transform .32s cubic-bezier(.2,.8,.2,1); z-index: 30; border-top: 1px solid var(--line); }
+  .sheet.on { transform: none; }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: #3a3f47; margin: 0 auto 12px; }
+  .amounts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0; }
+  .amt { background: var(--card2); border: 1.5px solid var(--line); border-radius: 16px; padding: 14px; text-align: left; }
+  .amt b { font-family: var(--display); font-size: 30px; display: block; line-height: 1; }
+  .amt span { font-size: 12px; color: var(--green); font-weight: 700; }
+  .amt.sel { border-color: var(--volt); background: rgba(61,217,255,.08); }
+  .pay { display: flex; gap: 8px; margin: 6px 0 14px; }
+  .pay div { flex: 1; text-align: center; padding: 10px 6px; border-radius: 12px; background: var(--card2); border: 1.5px solid var(--line); font-size: 12.5px; font-weight: 700; }
+  .pay div.sel { border-color: var(--volt); }
+  .qr { width: 210px; height: 210px; margin: 8px auto 10px; background: #fff; border-radius: 18px; padding: 14px; }
+  .qr canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+  .center { text-align: center; }
+  .toast { position: absolute; left: 50%; top: 54px; transform: translate(-50%, -20px); background: var(--green); color: #052b17; font-weight: 700; padding: 10px 16px; border-radius: 99px; opacity: 0; transition: .3s; z-index: 40; white-space: nowrap; font-size: 14px; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+<div class="demo-note">Prototyp · keine echten Zahlungen</div>
+
+<div class="phone" id="phone">
+  <div class="screen" id="screen">
+
+    <!-- HOME -->
+    <section class="view active" id="v-home">
+      <header class="top"><div class="brand">Kart<span>&amp;</span>Fun</div><div class="avatar">LH</div></header>
+      <div class="wallet">
+        <div class="lbl">Dein Guthaben</div>
+        <div class="bal"><span id="bal">42,00</span> <small>€</small></div>
+        <div class="muted" style="font-size:13px;color:#a8dbe9">Gültig in Heuchelheim &amp; Hungen</div>
+        <div class="row"><div class="num">KF •••• 2049</div><span class="chip">Fahrer-Level 3</span></div>
+      </div>
+      <div class="btns">
+        <button class="btn primary" data-open="topup">＋ Aufladen</button>
+        <button class="btn" data-open="pay">▣ Bezahlen</button>
+      </div>
+
+      <h3>Deine Stats</h3>
+      <div class="tiles">
+        <div class="tile"><div class="v">28,41</div><div class="k">Bestzeit (s)</div></div>
+        <div class="tile"><div class="v">14</div><div class="k">Rennen</div></div>
+        <div class="tile"><div class="v">#7</div><div class="k">Monatsrang</div></div>
+      </div>
+
+      <h3>Als Nächstes</h3>
+      <div class="hero-ev">
+        <div class="k">Große Eröffnung</div>
+        <div class="t">Gießens erste E-Kartbahn</div>
+        <div class="muted" style="font-size:13px">1. Dezember · Heuchelheim · Freie Probefahrt für App-Nutzer</div>
+        <div class="countdown" id="cd"></div>
+      </div>
+
+      <h3>Angebote</h3>
+      <div class="list">
+        <div class="item"><div><span class="tag of">App-Vorteil</span><div class="t">Di–Do: 30 zahlen, 45 fahren</div><div class="s">Code wird beim Bezahlen automatisch angewendet</div></div></div>
+        <div class="item"><div><span class="tag of">Nach dem Rennen</span><div class="t">Darts oder Billard gratis</div><div class="s">Zu jeder Kart-Buchung über 30 €</div></div></div>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section class="view" id="v-events">
+      <header class="top"><div class="brand">Events</div></header>
+      <div class="seg" id="evseg"><button class="on" data-f="all">Alle</button><button data-f="ev">Events</button><button data-f="tu">Turniere</button></div>
+      <div class="list" id="evlist">
+        <div class="item" data-k="ev"><div class="date"><b>01</b><span>Dez</span></div><div><span class="tag ev">Event</span><div class="t">Große Eröffnung</div><div class="s">Ab 14 Uhr · DJ, Probefahrten, Gewinnspiel</div></div><span class="go">Dabei ›</span></div>
+        <div class="item" data-k="tu"><div class="date"><b>13</b><span>Dez</span></div><div><span class="tag tu">Turnier</span><div class="t">Weihnachts-Grand-Prix</div><div class="s">Quali + 2 Rennen · 12 Plätze frei · 59 €</div></div><span class="go">Anmelden ›</span></div>
+        <div class="item" data-k="ev"><div class="date"><b>20</b><span>Dez</span></div><div><span class="tag ev">Event</span><div class="t">Firmen-Weihnachtsfeiern</div><div class="s">Rennen, Darts, Billard · Gruppen ab 8</div></div><span class="go">Anfragen ›</span></div>
+        <div class="item" data-k="tu"><div class="date"><b>10</b><span>Jan</span></div><div><span class="tag tu">Turnier</span><div class="t">Chef gegen Stellvertreter</div><div class="s">Fordere das Team heraus · Zuschauer gratis</div></div><span class="go">Infos ›</span></div>
+        <div class="item" data-k="tu"><div class="date"><b>24</b><span>Jan</span></div><div><span class="tag tu">Turnier</span><div class="t">Studi-Cup Gießen</div><div class="s">Mit Studi-Ausweis 20 % günstiger</div></div><span class="go">Anmelden ›</span></div>
+        <div class="item" data-k="ev"><div class="date"><b>14</b><span>Feb</span></div><div><span class="tag ev">Event</span><div class="t">Valentins-Duell</div><div class="s">2 Personen · Rennen + Drink</div></div><span class="go">Dabei ›</span></div>
+      </div>
+    </section>
+
+    <!-- RANKING -->
+    <section class="view" id="v-rank">
+      <header class="top"><div class="brand">Bestzeiten</div></header>
+      <div class="seg" id="rkseg"><button class="on">Woche</button><button>Monat</button><button>Allzeit</button></div>
+      <div class="lb">
+        <div class="r"><div class="p">1</div><div><b>Max R.</b><div class="muted" style="font-size:12px">Studi-Cup Gewinner</div></div><div class="time">27,08</div></div>
+        <div class="r"><div class="p">2</div><div><b>Leon H.</b><div class="muted" style="font-size:12px">Team Kart&amp;Fun</div></div><div class="time">27,36</div></div>
+        <div class="r"><div class="p">3</div><div><b>Sarah K.</b></div><div class="time">27,90</div></div>
+        <div class="r"><div class="p">4</div><div><b>Tim B.</b></div><div class="time">28,02</div></div>
+        <div class="r"><div class="p">5</div><div><b>Jonas W.</b></div><div class="time">28,15</div></div>
+        <div class="r"><div class="p">6</div><div><b>Lisa M.</b></div><div class="time">28,33</div></div>
+        <div class="r me"><div class="p">7</div><div><b>Du</b><div class="muted" style="font-size:12px">0,63 s bis Platz 3</div></div><div class="time">28,41</div></div>
+      </div>
+      <p class="muted" style="font-size:13px;margin-top:14px">Die schnellste Runde der Woche gewinnt eine Freifahrt und landet im Instagram-Video „Bestzeit der Woche“.</p>
+    </section>
+
+    <!-- PROFIL -->
+    <section class="view" id="v-me">
+      <header class="top"><div class="brand">Konto</div><div class="avatar">LH</div></header>
+      <div class="item"><div><div class="t">Hinterlegte Karte</div><div class="s">Visa •••• 4821 · für automatisches Aufladen</div></div><span class="go">Ändern ›</span></div>
+      <div class="item" style="margin-top:10px"><div><div class="t">Auto-Aufladen</div><div class="s">Unter 10 € automatisch 50 € nachladen</div></div><span class="go" id="auto">AN</span></div>
+      <h3>Verlauf</h3>
+      <div id="txs">
+        <div class="tx"><div>Aufladen · Bonus +5 €</div><div class="a plus">+ 55,00 €</div></div>
+        <div class="tx"><div>30 Min. Fahrt · Heuchelheim</div><div class="a">− 41,00 €</div></div>
+        <div class="tx"><div>Billard 1 Std.</div><div class="a">− 0,00 €</div></div>
+        <div class="tx"><div>Aufladen</div><div class="a plus">+ 20,00 €</div></div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button class="on" data-v="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Start</button>
+    <button data-v="events"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Events</button>
+    <button data-v="rank"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Bestzeiten</button>
+    <button data-v="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Konto</button>
+  </nav>
+
+  <div class="scrim" id="scrim"></div>
+
+  <div class="sheet" id="s-topup">
+    <div class="grab"></div>
+    <h2 style="margin:0">Guthaben aufladen</h2>
+    <div class="muted" style="font-size:13px">Je mehr du lädst, desto mehr Bonus.</div>
+    <div class="amounts" id="amts">
+      <button class="amt" data-a="20"><b>20 €</b><span>&nbsp;</span></button>
+      <button class="amt sel" data-a="50" data-b="5"><b>50 €</b><span>+ 5 € Bonus</span></button>
+      <button class="amt" data-a="100" data-b="15"><b>100 €</b><span>+ 15 € Bonus</span></button>
+      <button class="amt" data-a="200" data-b="40"><b>200 €</b><span>+ 40 € Bonus</span></button>
+    </div>
+    <div class="pay" id="pays"><div class="sel">Visa •••• 4821</div><div>Apple Pay</div><div>PayPal</div></div>
+    <button class="btn primary" style="width:100%" id="doTopup">50 € aufladen</button>
+  </div>
+
+  <div class="sheet" id="s-pay">
+    <div class="grab"></div>
+    <h2 style="margin:0" class="center">An der Kasse zeigen</h2>
+    <div class="qr"><canvas id="qr" width="29" height="29"></canvas></div>
+    <div class="center muted" style="font-size:13px">Guthaben: <b style="color:var(--text)" id="bal2">42,00 €</b> · Code wechselt alle 30 Sek.</div>
+    <button class="btn" style="width:100%;margin-top:14px" data-close>Fertig</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function () {
+  var bal = 42, sel = 50, bonus = 5;
+  var fmt = function (n) { return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var $ = function (id) { return document.getElementById(id); };
+  function showBal() { $('bal').textContent = fmt(bal); $('bal2').textContent = fmt(bal) + ' €'; }
+
+  // Tabs
+  document.querySelectorAll('#tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('#tabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('active', v.id === 'v-' + b.dataset.v); });
+      $('screen').scrollTop = 0;
+    });
+  });
+
+  // Sheets
+  function open(id) { $('scrim').classList.add('on'); $('s-' + id).classList.add('on'); if (id === 'pay') drawQR(); }
+  function close() { $('scrim').classList.remove('on'); document.querySelectorAll('.sheet').forEach(function (s) { s.classList.remove('on'); }); }
+  document.querySelectorAll('[data-open]').forEach(function (b) { b.addEventListener('click', function () { open(b.dataset.open); }); });
+  document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', close); });
+  $('scrim').addEventListener('click', close);
+
+  // Top up
+  document.querySelectorAll('#amts .amt').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('#amts .amt').forEach(function (x) { x.classList.toggle('sel', x === b); });
+      sel = +b.dataset.a; bonus = +(b.dataset.b || 0);
+      $('doTopup').textContent = sel + ' € aufladen';
+    });
+  });
+  document.querySelectorAll('#pays div').forEach(function (d) {
+    d.addEventListener('click', function () { document.querySelectorAll('#pays div').forEach(function (x) { x.classList.toggle('sel', x === d); }); });
+  });
+  $('doTopup').addEventListener('click', function () {
+    bal += sel + bonus; showBal(); close();
+    var t = document.createElement('div'); t.className = 'tx';
+    t.innerHTML = '<div>Aufladen' + (bonus ? ' · Bonus +' + bonus + ' €' : '') + '</div><div class="a plus">+ ' + fmt(sel + bonus) + ' €</div>';
+    $('txs').insertBefore(t, $('txs').firstChild);
+    toast('+' + fmt(sel + bonus) + ' € aufgeladen (Demo)');
+  });
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('on'); setTimeout(function () { t.classList.remove('on'); }, 2200); }
+
+  // Auto top-up toggle
+  $('auto').addEventListener('click', function () { this.textContent = this.textContent === 'AN' ? 'AUS' : 'AN'; });
+
+  // Event filter
+  document.querySelectorAll('#evseg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('#evseg button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      document.querySelectorAll('#evlist .item').forEach(function (i) { i.style.display = (b.dataset.f === 'all' || i.dataset.k === b.dataset.f) ? '' : 'none'; });
+    });
+  });
+  document.querySelectorAll('#rkseg button').forEach(function (b) {
+    b.addEventListener('click', function () { document.querySelectorAll('#rkseg button').forEach(function (x) { x.classList.toggle('on', x === b); }); });
+  });
+  document.querySelectorAll('#evlist .go').forEach(function (g) { g.addEventListener('click', function () { toast('Angemeldet (Demo)'); }); });
+
+  // Countdown to opening
+  function cd() {
+    var d = new Date(2026, 11, 1, 14) - new Date();
+    if (d < 0) { $('cd').innerHTML = '<div><b>Jetzt</b><span>geöffnet</span></div>'; return; }
+    var D = Math.floor(d / 864e5), H = Math.floor(d / 36e5) % 24, M = Math.floor(d / 6e4) % 60, S = Math.floor(d / 1e3) % 60;
+    $('cd').innerHTML = [[D, 'Tage'], [H, 'Std'], [M, 'Min'], [S, 'Sek']].map(function (x) { return '<div><b>' + String(x[0]).padStart(2, '0') + '</b><span>' + x[1] + '</span></div>'; }).join('');
+  }
+  cd(); setInterval(cd, 1000);
+
+  // Fake QR (Muster, kein echter Code)
+  function drawQR() {
+    var c = $('qr'), x = c.getContext('2d'), n = 29; x.fillStyle = '#fff'; x.fillRect(0, 0, n, n); x.fillStyle = '#0f1114';
+    var seed = Math.floor(Date.now() / 30000);
+    function r() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) if (r() > .52) x.fillRect(i, j, 1, 1);
+    [[0, 0], [n - 7, 0], [0, n - 7]].forEach(function (p) {
+      x.fillStyle = '#0f1114'; x.fillRect(p[0], p[1], 7, 7); x.fillStyle = '#fff'; x.fillRect(p[0] + 1, p[1] + 1, 5, 5); x.fillStyle = '#0f1114'; x.fillRect(p[0] + 2, p[1] + 2, 3, 3);
+    });
+  }
+  showBal();
+})();
+</script>
+</body>
+</html>
